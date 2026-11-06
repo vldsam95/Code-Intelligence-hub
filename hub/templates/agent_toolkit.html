@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Prompts & Skills — Code Intelligence{% endblock %}
+{% block page_title %}Prompts, Skills & Agent Tools{% endblock %}
+{% block content %}
+<section class="panel"><p class="eyebrow">RELEASE {{ product_version }}</p><p>The skill and prompt include conditional guidance for authorized security scenarios and a local audit tool that never downloads or updates software.</p></section>
+<div class="page-intro"><p>Copy a complete prompt and, if needed, one ZIP to your agent. It detects the environment, installs the Worker and MCP, and enables Code Intelligence only for the project you explicitly request.</p></div>
+<section class="panel accent">
+  <p class="eyebrow">ONE UNIVERSAL PROMPT</p><h2>Universal prompt for installation, connection and workflow</h2>
+  <ol class="steps"><li>To connect a Hub, create a <b>Host Install Token</b> for one-time use. Leave blank for local-only installation.</li><li>Project Access is required only when linking a checkout to an existing Hub project; there is no token per agent.</li><li>Copy one prompt, or attach the ZIP if curl is blocked.</li></ol>
+  <div class="prompt-controls"><label>Host Install Token (optional)<input id="prompt-worker-token" type="password" autocomplete="off" placeholder="Blank = LOCAL_ONLY"></label><label>Project Access (optional)<input id="prompt-project-token" type="password" autocomplete="off" placeholder="ci_proj_v1_…"></label><button id="build-agent-prompt" class="primary" type="button">Prepare prompt</button></div>
+  <textarea id="universal-prompt-template" class="prompt-text" readonly>{{ universal_prompt }}</textarea>
+  <div class="actions"><button class="secondary" data-copy-target="#universal-prompt-template">Copy full prompt</button><button class="secondary" data-download-target="#universal-prompt-template" data-download-name="CODEINTEL_AGENT_PROMPT.txt">Download prompt as TXT</button></div>
+  <div class="alert warning">A token inserted into a prompt is a visible secret. Keep it out of Git. Without a token, the installer sets up a fully functional local Code Intelligence environment.</div>
+</section>
+<section class="two-col">
+  <article class="panel"><p class="eyebrow">MANUAL / AIR-GAPPED PATH</p><h2>Complete ZIP for agents without curl</h2>{% if manual_bundle %}<p>The same release used by the curl command is available as a signed ZIP with Linux amd64/arm64 binaries, an offline installer, Windows/WSL PowerShell, adapters, a skill, documentation and checksums.</p><a class="primary" href="/downloads/{{ manual_bundle.name }}">Download {{ manual_bundle.name }}</a><small>SHA‑256: <code>{{ manual_bundle.sha256 }}</code></small>{% else %}<div class="alert warning">The ZIP will be available after the next release build.</div>{% endif %}</article>
+  <article class="panel"><p class="eyebrow">CURL PATH</p><h2>Linux / VPS</h2><pre><code id="toolkit-curl">curl -fsSL {{ base_url }}/downloads/install.sh | sh -s -- \
+  --hub {{ base_url }} \
+  --install-token &lt;OPTIONAL_INSTALL_TOKEN&gt; \
+  --clients codex,claude,hermes</code></pre><button class="secondary" data-copy-target="#toolkit-curl">Copy command</button></article>
+</section>
+<section class="panel"><p class="eyebrow">CANONICAL SKILL</p><h2>Agent Operating Skill / Policy</h2><p>The installer configures the skill automatically. It is non-invasive: without a marker, it exits immediately and never creates a project.</p><textarea id="canonical-skill" class="prompt-text compact" readonly>{{ skill_markdown }}</textarea><div class="actions"><button class="secondary" data-copy-target="#canonical-skill">Copy skill</button><a class="secondary" href="/api/v1/docs/AGENT_OPERATING_POLICY.md?format=raw">Raw Markdown</a></div></section>
+<section class="panel"><div class="panel-head"><div><p class="eyebrow">HUMAN-FRIENDLY GUIDES</p><h2>Need help choosing a prompt?</h2></div><a class="primary" href="/guides">Open guides</a></div><p>Guides for new hosts, new projects, code changes, server migration, LLM Wikis and remote agents are maintained together to avoid conflicting versions.</p></section>
+{% endblock %}

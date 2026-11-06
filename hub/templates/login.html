@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in — Code Intelligence Hub</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body class="login-body">
+  <main class="login-shell">
+    <section class="login-copy">
+      <div class="brand-mark large">CI</div>
+      <p class="eyebrow">PRIVATE CONTROL PLANE</p>
+      <h1>Justified confidence<br>in every code change.</h1>
+      <p>The Hub brings together context, evidence, reviews and quality gates without uploading full source.</p>
+      <ul class="trust-list">
+        <li>Source truth stays beside the code</li>
+        <li>Every piece of evidence is revision-bound</li>
+        <li>UNKNOWN remains visible</li>
+      </ul>
+    </section>
+    <section class="login-card">
+      <p class="eyebrow">OWNER ACCESS</p>
+      <h2>Secure sign-in</h2>
+      <p class="muted">Access is restricted to the system owner.</p>
+      {% if error %}<div class="alert danger">{{ error }}</div>{% endif %}
+      <form method="post" action="/login" autocomplete="on">
+        <label>Username<input name="username" required autocomplete="username" autofocus></label>
+        <label>Password<input name="password" type="password" required autocomplete="current-password"></label>
+        <button class="primary wide" type="submit">Sign in to Hub</button>
+      </form>
+      <p class="fine">The connection uses TLS. Login attempts are rate-limited and audited without secrets.</p>
+    </section>
+  </main>
+</body>
+</html>

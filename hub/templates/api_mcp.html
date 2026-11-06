@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}API & MCP — Code Intelligence{% endblock %}
+{% block page_title %}API & MCP{% endblock %}
+{% block content %}
+<section class="metric-grid compact"><article><span>Hub API</span><strong>v1</strong><small>JSON / snake_case</small></article><article><span>Remote MCP</span><strong>{{ product_version }}</strong><small>Project-scoped</small></article><article><span>Local MCP</span><strong>stdio</strong><small>Unix socket → Worker</small></article><article><span>Payload</span><strong>Bounded</strong><small>No unbounded raw graph</small></article></section>
+<section class="two-col"><article class="panel"><h2>OpenAPI</h2><p>Interactive documentation and machine-readable JSON.</p><div class="actions"><a class="primary" href="/api-docs">Open API documentation</a><a class="secondary" href="/api/v1/openapi.json">Raw JSON</a></div></article><article class="panel"><h2>Remote Hub MCP</h2><p>Endpoint: <code>POST /mcp</code>. Authenticate using a Project Agent bearer token.</p><p>Tools: list_projects, get_project_context, get_code_health, get_quality_history, get_findings, get_recent_changes, ask_project_context, request_live_analysis, get_agent_setup.</p></article></section>
+<section class="panel"><p class="eyebrow">API CONVENTIONS</p><h2>Stable contract</h2><ul class="check-list"><li>UUIDv4 identifiers and UTC RFC3339 timestamps</li><li>Cursor pagination, up to 200 items</li><li><code>X-Request-ID</code> on every request</li><li>Idempotent Worker reports and spool replay</li><li>Structured error envelopes; API clients never receive HTML errors</li><li>Evidence is always bound to a project, instance and source revision</li></ul></section>
+{% endblock %}
+

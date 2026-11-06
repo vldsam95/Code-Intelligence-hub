@@ -1,0 +1,11 @@
+{% macro pagination(pager, label='records') -%}
+{% if pager and pager.pages > 1 %}
+<nav class="pagination" aria-label="Pagination: {{ label }}">
+  {% if pager.previous_url %}<a class="secondary" href="{{ pager.previous_url }}">Previous</a>{% else %}<span class="secondary disabled">Previous</span>{% endif %}
+  <span>Page <b>{{ pager.page }}</b> of {{ pager.pages }} · {{ pager.total }} {{ label }} · 25 per page</span>
+  {% if pager.next_url %}<a class="secondary" href="{{ pager.next_url }}">Next</a>{% else %}<span class="secondary disabled">Next</span>{% endif %}
+</nav>
+{% elif pager %}
+<div class="pagination single"><span>{{ pager.total }} {{ label }} · Up to 25 per page</span></div>
+{% endif %}
+{%- endmacro %}

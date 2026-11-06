@@ -1,0 +1,5 @@
+quality:
+  graph_is_advisory: true
+  absence_requires_coverage: true
+  dead_code_auto_delete: false
+

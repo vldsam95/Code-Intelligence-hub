@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% from "_pagination.html" import pagination %}
+{% block title %}Projects — Code Intelligence{% endblock %}
+{% block page_title %}Projects & Project Instances{% endblock %}
+{% block content %}
+<div class="page-intro"><p>Project identity is a portable UUID in <code>.code-intel/project.yaml</code>. Paths, hosts and Git remotes do not establish project identity.</p></div>
+<form class="project-search" method="get" action="/projects" role="search">
+  <label for="project-search-input">Search by name or slug</label>
+  <div><input id="project-search-input" name="q" value="{{ project_query }}" placeholder="For example: billing-api" autocomplete="off"><button class="primary" type="submit">Search</button>{% if project_query %}<a class="secondary" href="/projects">Clear</a>{% endif %}</div>
+  <small>{{ pager.total }} results · 25 projects per page</small>
+</form>
+<section class="cards-grid">
+{% for row in projects %}
+  <a class="project-card" href="/projects/{{ row.project.id }}/view">
+    <div class="card-top"><span class="badge {{ row.health.currentness|lower }}">{{ row.health.currentness }}</span><span class="badge {{ row.health.registration_state|lower }}">{{ row.health.registration_state }}</span><span class="status-dot {{ 'good' if row.health.worker_online else 'off' }}"></span></div>
+    <h2>{{ row.project.name }}</h2><p>{{ row.project.purpose or 'No project description provided.' }}</p>
+    <dl><div><dt>Latest gate</dt><dd>{{ row.health.last_quality_gate or 'UNKNOWN' }}</dd></div><div><dt>Revision</dt><dd><code>{{ (row.health.current_revision or '—')[:12] }}</code></dd></div></dl>
+  </a>
+{% else %}
+  <div class="empty wide-empty"><span>⌘</span><h3>Your first project appears after Worker enrollment</h3><p>The Worker reads the local manifest and registers an instance independently of GitHub.</p></div>
+{% endfor %}
+</section>
+{{ pagination(pager, 'Projects') }}
+{% endblock %}

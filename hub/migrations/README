@@ -1,0 +1,2 @@
+Alembic migrations for the durable Hub database. Production startup never uses create_all().
+

@@ -1,0 +1,34 @@
+services:
+  hub-api:
+    build:
+      context: ../..
+      dockerfile: hub/Dockerfile
+    image: codeintel-hub:1.3.0
+    container_name: codeintel-hub-api
+    restart: unless-stopped
+    env_file:
+      - /etc/code-intelligence/hub.env
+    command: ["sh", "-c", "alembic upgrade head && exec uvicorn hub.app.main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips='*'"]
+    ports:
+      - "127.0.0.1:18200:8000"
+    volumes:
+      - /var/lib/code-intelligence-hub:/data
+      - /var/lib/code-intelligence-hub/artifacts:/artifacts
+      - /etc/code-intelligence/hub-master.key:/run/secrets-root/hub-master.key:ro
+    tmpfs:
+      - /tmp:size=128m,mode=1777
+      - /run/codeintel-secrets:size=1m,mode=0700
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

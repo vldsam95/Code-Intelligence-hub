@@ -1,0 +1,59 @@
+security_scenarios:
+  enabled: true
+  mode: plan_only # change only to lab or authorized_staging after owner approval
+  environment: unclassified # lab or staging is required for execution
+  authorization:
+    status: pending
+    scope_ref: null
+    expires_at: null
+  base_url: null
+  allowed_hosts: []
+  deny_production: true
+  allow_state_changing: false
+  max_requests: 24
+  max_concurrency: 3 # hard cap is 4; used only when a rapid_repeat scenario opts in
+  timeout_sec: 10
+  max_response_bytes: 16384
+  local_evidence_only: true
+  require_correlation: true
+  actors:
+    - id: user_a
+      bearer_token_env: CODEINTEL_TEST_USER_A_TOKEN
+      headers_from_env: {}
+    - id: user_b
+      bearer_token_env: CODEINTEL_TEST_USER_B_TOKEN
+      headers_from_env: {}
+    - id: low_role
+      bearer_token_env: CODEINTEL_TEST_LOW_ROLE_TOKEN
+      headers_from_env: {}
+  endpoint_inventory: [users-delete, chat-create]
+  scenarios:
+    - id: users-delete-anonymous
+      endpoint_id: users-delete
+      case: anonymous
+      method: DELETE
+      path: /api/users/742
+      route_symbol: DELETE /api/users/{id}
+      expect_status: [401]
+      allow_state_change: true
+    - id: chat-rapid-repeat
+      endpoint_id: chat-create
+      case: rapid_repeat
+      method: POST
+      path: /api/chat
+      route_symbol: POST /api/chat
+      actor: user_a
+      json_body: {message: bounded-lab-fixture}
+      expect_status: [200]
+      expect_terminal_status: [429]
+      repeat: 3
+      parallel_burst: true
+      allow_state_change: true
+      cost_probe:
+        path: /api/test-only/meter
+        actor: user_a
+        json_pointer: /used
+        max_delta: 1.0
+  # This starter is intentionally incomplete. Add a scenario for every inventory/case pair below,
+  # or a narrowly justified exclusion. Validation stays DENIED while coverage is incomplete.
+  exclusions: []

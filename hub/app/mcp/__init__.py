@@ -1,0 +1,1 @@
+"""Remote Hub MCP adapter."""

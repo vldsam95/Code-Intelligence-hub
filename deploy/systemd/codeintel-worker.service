@@ -1,0 +1,28 @@
+[Unit]
+Description=Code Intelligence Worker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+Group=codeintel
+Environment=HOME=/var/lib/code-intelligence
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+ExecStart=/usr/local/bin/codeintel worker run
+Restart=on-failure
+RestartSec=5s
+RuntimeDirectory=code-intelligence
+RuntimeDirectoryMode=0770
+StateDirectory=code-intelligence
+StateDirectoryMode=0770
+ConfigurationDirectory=code-intelligence
+ConfigurationDirectoryMode=0750
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+LimitNOFILE=65536
+MemoryHigh=1536M
+MemoryMax=2048M
+
+[Install]
+WantedBy=multi-user.target

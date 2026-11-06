@@ -1,0 +1,5 @@
+graph_database_tracked: false
+primary_root: .
+rebuild_command: codeintel open .
+related_roots: []
+schema_version: 1

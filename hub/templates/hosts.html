@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% from "_pagination.html" import pagination %}
+{% block title %}Host Access — Code Intelligence{% endblock %}
+{% block page_title %}Hosts & Workers{% endblock %}
+{% block content %}
+<div class="page-intro"><p><b>Host Access</b> determines only whether this computer may create or link new Hub projects. Revoking it does not disable the Worker, synchronization for existing projects or local Code Intelligence.</p></div>
+<section class="panel accent"><div class="panel-head"><div><p class="eyebrow">INSTALL A NEW HOST</p><h2>One-time installation</h2></div><button id="create-host-install-token" class="primary" type="button">Create Host Install Token and command</button></div><p>Install Tokens are valid for 15 minutes and consumed once. After installation, agents use local MCP without individual tokens. For installation without a Hub, use <code>--local-only</code>.</p><div id="host-install-result" class="secret-result hidden"><span>Copy the complete command to the agent on the new host:</span><pre><code></code></pre><button data-copy-target="#host-install-result code">Copy command</button><small></small></div><div class="actions"><a class="secondary" href="/downloads">Manual ZIP / Windows / checksums</a><a class="secondary" href="/agent-toolkit">Universal prompt</a></div></section>
+<section class="panel"><p class="eyebrow">HOST ACCESS</p><h2>Servers and computers</h2><div class="table-wrap"><table><thead><tr><th>Host</th><th>Worker</th><th>Version</th><th>Sync</th><th>New project creation/linking</th><th>Heartbeat</th><th>Actions</th></tr></thead><tbody>
+{% for row in workers %}{% set host = hosts.get(row.host_id) %}{% set access = host_access.get(row.host_id) %}<tr>
+  <td><strong>{{ host.name if host else row.host_id[:12] }}</strong><small><code>{{ row.host_id[:12] }}</code></small></td>
+  <td><code>{{ row.id[:12] }}</code><small>{{ row.adapters|join(', ') or 'No adapters' }}</small></td>
+  <td>{{ row.version }}<small>{{ row.compatibility }}</small></td>
+  <td><span class="badge {{ row.status|lower }}">{{ row.status }}</span></td>
+  <td>{% if host and host.provisioning_enabled and access %}<span class="badge current">ON</span><small>{{ access.token_prefix }}…</small>{% else %}<span class="badge stale">OFF</span><small>Existing projects continue working</small>{% endif %}</td>
+  <td>{{ row.last_heartbeat_at or '—' }}</td>
+  <td><div class="actions"><button data-host-access-action="rotate" data-host-id="{{ row.host_id }}">Rotate / Enable</button>{% if host and host.provisioning_enabled %}<button class="danger-button" data-host-access-action="revoke" data-host-id="{{ row.host_id }}">Disable New Projects</button>{% endif %}</div></td>
+</tr>{% else %}<tr><td colspan="7">No registered Workers. Local-only installation is still supported.</td></tr>{% endfor %}</tbody></table></div>{{ pagination(pager, 'Hosts') }}</section>
+<div id="token-result" class="secret-result hidden"><span>New Host Access — stored automatically on the host after its next bootstrap</span><code></code><button data-copy-target="#token-result code">Copy</button></div>
+<section class="panel"><details><summary>Advanced: Worker machine sync</summary><p>The internal Worker credential is used for heartbeats, reports and relay. It is separate from Host Access and never given to agents. Disconnecting a Worker is a different action from disabling new project provisioning.</p></details></section>
+<dialog id="reauth-dialog"><form method="dialog"><h3>Reauthenticate</h3><p>Enter the owner password to rotate Host Access.</p><label>Password<input id="reauth-password" type="password" autocomplete="current-password"></label><div class="dialog-actions"><button value="cancel">Cancel</button><button id="reauth-confirm" value="default" class="primary">Verify</button></div></form></dialog>
+{% endblock %}

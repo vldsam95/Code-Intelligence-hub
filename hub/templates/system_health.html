@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% from "_pagination.html" import pagination %}
+{% block title %}System Health — Code Intelligence{% endblock %}
+{% block page_title %}System Health{% endblock %}
+{% block content %}
+<section class="metric-grid compact"><article><span>Hub API</span><strong>READY</strong><small>v{{ product_version }}</small></article><article><span>Database</span><strong>{{ 'AVAILABLE' if db_ok else 'UNAVAILABLE' }}</strong><small>SQLite WAL</small></article><article><span>Job backlog</span><strong>{{ pending }}</strong><small>Remote analysis</small></article><article><span>Backup</span><strong>{{ backup.status if backup else 'UNKNOWN' }}</strong><small>{{ backup.created_at if backup else 'Not yet reported' }}</small></article></section>
+<section class="panel"><p class="eyebrow">WORKER OBSERVABILITY</p><h2>Worker resources</h2><div class="table-wrap"><table><thead><tr><th>Worker</th><th>Status</th><th>Version</th><th>Compatibility</th><th>RSS</th><th>Graph</th><th>Spool</th><th>Last sync</th></tr></thead><tbody>{% for row in workers %}<tr><td><code>{{ row.id[:12] }}</code></td><td>{{ row.status }}</td><td>{{ row.version }}</td><td>{{ row.compatibility }}</td><td>{{ row.resource_summary.get('rss_mb', '—') }} MB</td><td>{{ row.resource_summary.get('graph_bytes', '—') }}</td><td>{{ row.resource_summary.get('spool_bytes', '—') }}</td><td>{{ row.last_heartbeat_at or '—' }}</td></tr>{% else %}<tr><td colspan="8">No Workers.</td></tr>{% endfor %}</tbody></table></div>{{ pagination(pager, 'Workers') }}</section>
+<div class="alert info">Backup readiness requires two separate backups: the encrypted Hub database and the master encryption key. The Worker graph is derived data and does not require backup.</div>
+{% endblock %}

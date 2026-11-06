@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Settings — Code Intelligence{% endblock %}
+{% block page_title %}System Settings{% endblock %}
+{% block content %}
+<section class="two-col"><article class="panel"><p class="eyebrow">VERSION CONTRACT</p><h2>Compatibility</h2><dl class="settings-list"><div><dt>Product</dt><dd>{{ settings.hub_version }}</dd></div><div><dt>Agent policy</dt><dd>{{ settings.agent_policy_version }}</dd></div><div><dt>Worker MCP schema</dt><dd>{{ settings.worker_mcp_schema_version }}</dd></div><div><dt>Hub MCP schema</dt><dd>{{ settings.hub_mcp_schema_version }}</dd></div><div><dt>Manifest schema</dt><dd>{{ settings.project_manifest_schema_version }}</dd></div></dl></article><article class="panel"><p class="eyebrow">SECURITY</p><h2>Owner & Sessions</h2><dl class="settings-list"><div><dt>Owner</dt><dd>{{ owner.username }}</dd></div><div><dt>Idle timeout</dt><dd>12 hours</dd></div><div><dt>Absolute max</dt><dd>7 days</dd></div><div><dt>Cookie</dt><dd>Secure + HttpOnly + SameSite</dd></div><div><dt>CSRF</dt><dd>Enforced</dd></div></dl></article></section>
+<section class="panel"><p class="eyebrow">DEFAULT RESOURCE PROFILE</p><h2>ram_constrained</h2><p>Heavy jobs: 1 · LSP processes: 1 · No persistent Memgraph, Qdrant, Ollama or local LLM · Runtime collectors start on demand only.</p></section>
+{% endblock %}
+

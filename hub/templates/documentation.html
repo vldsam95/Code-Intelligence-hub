@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Documentation — Code Intelligence{% endblock %}
+{% block page_title %}Documentation Center{% endblock %}
+{% block content %}
+<section class="docs-layout"><aside class="docs-nav"><p class="eyebrow">VERSION {{ product_version }}</p>{% for doc in docs %}<a class="{{ 'selected' if doc == selected }}" href="/documentation?doc={{ doc }}">{{ doc }}</a>{% endfor %}</aside><article class="panel docs-content"><div class="panel-head"><span class="badge current">Rendered Markdown</span><div class="actions"><a class="secondary" href="{{ raw_url }}">Raw Markdown</a><a class="secondary" href="/docs-bundle.zip">ZIP</a></div></div>{{ rendered|safe }}</article></section>
+{% endblock %}
+

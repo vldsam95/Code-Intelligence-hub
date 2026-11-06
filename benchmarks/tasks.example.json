@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "dataset_status": "EXAMPLE_ONLY_NOT_PRODUCTION_EVIDENCE",
+  "tasks": [
+    {
+      "task_id": "example-python-route",
+      "project_path": "fixtures/projects/python-fastapi",
+      "starting_source_revision": null,
+      "category": "route_api",
+      "prompt": "Add a readiness endpoint without changing the existing health contract.",
+      "verification_argv": ["python3", "-m", "compileall", "-q", "."]
+    },
+    {
+      "task_id": "example-php-refactor",
+      "project_path": "fixtures/projects/php-laravel",
+      "starting_source_revision": null,
+      "category": "refactor",
+      "prompt": "Extract the health response construction into a shared service.",
+      "verification_argv": ["php", "-l", "app/Http/Controllers/HealthController.php"]
+    },
+    {
+      "task_id": "example-ts-dynamic",
+      "project_path": "fixtures/projects/typescript-express-dynamic",
+      "starting_source_revision": null,
+      "category": "dynamic_runtime",
+      "prompt": "Add an authenticated status route while preserving dynamic dispatch behavior.",
+      "verification_argv": ["npm", "test"]
+    }
+  ]
+}
+

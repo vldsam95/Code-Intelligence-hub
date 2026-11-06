@@ -1,0 +1,10 @@
+schema_version: 1
+project_id: 5950546d-e106-4350-a322-e8fc86fcf7c8
+slug: fixture-typescript-express-dynamic
+name: Fixture TypeScript Express Dynamic
+enabled: true
+wiki:
+  mode: none
+workspace:
+  mode: live
+

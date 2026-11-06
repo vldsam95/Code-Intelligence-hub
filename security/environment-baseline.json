@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-09-09",
+  "maximum_review_age_days": 90,
+  "code_intelligence_version": "1.3.0",
+  "minimum_versions": {
+    "python": "3.11.0",
+    "rustc": "1.75.0",
+    "cargo": "1.75.0",
+    "git": "2.39.0"
+  },
+  "blocked_versions": {},
+  "reviewed_sources": [
+    {
+      "name": "reverse-skill",
+      "url": "https://github.com/zhaoxuya520/reverse-skill",
+      "commit": "7e2097fd90d25c2f976f6eba26d6c00aa88051df",
+      "runtime_dependency": false
+    }
+  ],
+  "bundled_components": [
+    {
+      "name": "tree-sitter-rust",
+      "version": "0.20.4",
+      "lockfile": "worker/Cargo.lock",
+      "runtime_download": false
+    }
+  ],
+  "update_policy": "manual_review_signed_pinned_atomic_rollback",
+  "network_access": "never"
+}

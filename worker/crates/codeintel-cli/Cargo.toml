@@ -1,0 +1,30 @@
+[package]
+name = "codeintel-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "codeintel"
+path = "src/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+clap.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+serde_yaml.workspace = true
+sha2.workspace = true
+uuid.workspace = true
+codeintel-core = { path = "../codeintel-core" }
+codeintel-graph = { path = "../codeintel-graph" }
+codeintel-indexer = { path = "../codeintel-indexer" }
+codeintel-mcp = { path = "../codeintel-mcp" }
+codeintel-quality = { path = "../codeintel-quality" }
+codeintel-review = { path = "../codeintel-review" }
+codeintel-worker = { path = "../codeintel-worker" }
+
+[dev-dependencies]
+tempfile.workspace = true

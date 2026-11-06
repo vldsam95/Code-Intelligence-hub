@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% from "_pagination.html" import pagination %}
+{% block title %}Connections — Code Intelligence{% endblock %}
+{% block page_title %}Connections{% endblock %}
+{% block content %}
+<section class="panel accent"><p class="eyebrow">SIMPLE ACCESS MODEL</p><h2>Two access concepts to remember</h2><div class="reader-choice-grid"><article><span class="client-icon">H</span><h3>Host Access</h3><p>Can this host create or link new Hub projects?</p><a class="primary" href="/hosts">Manage hosts</a></article><article><span class="client-icon">P</span><h3>Project Access</h3><p>One token per project for Codex, Claude, Hermes or another authorized agent.</p><a class="primary" href="/projects">Select project</a></article></div><p>Local Code Intelligence — graph, review, runtime and quality gates — works without either credential.</p></section>
+<section class="panel"><details><summary>Advanced credentials — compatibility and integrations</summary><p>Internal and legacy credentials are maintained here. There is no need to create a token per agent or session.</p>
+  <form id="token-create-form" class="inline-form">
+    <label>Label<input name="label" required placeholder="Advanced integration"></label>
+    <label>Type<select name="token_type"><option>ADMIN_API</option><option>WIKI_CONNECTION</option><option>AGENT_HUB_READ</option><option>AGENT_LIVE_ANALYSIS</option></select></label>
+    <label>Project<select name="scope_id"><option value="">Global</option>{% for project in projects %}<option value="{{ project.id }}">{{ project.name }}</option>{% endfor %}</select></label>
+    <button class="secondary" type="submit">Create advanced token</button>
+  </form>
+  <div id="token-result" class="secret-result hidden"><strong>Copy now:</strong><code></code><button type="button" data-copy-target="#token-result code">Copy</button></div>
+  <div class="table-wrap"><table><thead><tr><th>Label</th><th>Type</th><th>Scope</th><th>Prefix</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+  {% for row in tokens %}<tr><td>{{ row.label }}</td><td>{{ row.token_type }}</td><td>{{ row.scope_type }}</td><td><code>{{ row.token_prefix }}…</code></td><td>{{ row.status }}</td><td><div class="actions">{% if not row.one_time and row.status == 'ACTIVE' %}<button data-token-action="reveal" data-token-id="{{ row.id }}" data-token-type="{{ row.token_type }}" data-scope-id="{{ row.scope_id or '' }}">Reveal</button>{% endif %}{% if row.status == 'ACTIVE' %}<button data-token-action="rotate" data-token-id="{{ row.id }}" data-token-type="{{ row.token_type }}" data-scope-id="{{ row.scope_id or '' }}">Rotate</button><button class="danger-button" data-token-action="revoke" data-token-id="{{ row.id }}">Revoke</button>{% endif %}</div></td></tr>{% else %}<tr><td colspan="6">No credentials.</td></tr>{% endfor %}</tbody></table></div>{{ pagination(pager, 'Credentials') }}
+</details></section>
+<dialog id="reauth-dialog"><form method="dialog"><h3>Reauthenticate</h3><p>Reveal/Rotate require the owner password.</p><label>Password<input id="reauth-password" type="password" autocomplete="current-password"></label><div class="dialog-actions"><button value="cancel">Cancel</button><button id="reauth-confirm" value="default" class="primary">Verify</button></div></form></dialog>
+{% endblock %}

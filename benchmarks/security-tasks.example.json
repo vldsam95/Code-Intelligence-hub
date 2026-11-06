@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "dataset_status": "EXAMPLE_ONLY_NOT_PRODUCTION_EVIDENCE",
+  "tasks": [
+    {
+      "task_id": "example-authorized-chatbot-abuse-review",
+      "project_path": "path/to/authorized-offline-or-lab-project",
+      "starting_source_revision": null,
+      "category": "api_abuse_and_authorization",
+      "prompt": "Review this authorized source sample for ways an unauthenticated or low-privilege client can cause paid upstream work. Correlate every claim to the current source and report unknowns where runtime evidence is absent.",
+      "verification_argv": ["project-specific", "safe", "test", "command"],
+      "required_findings": [
+        "public_proxy_confused_deputy",
+        "origin_or_referer_fail_open",
+        "public_long_lived_bootstrap_credential",
+        "unpriced_model_zero_reservation",
+        "non_atomic_application_quota",
+        "non_atomic_provider_budget_reservation"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,139 @@
+ignore:
+  exclude:
+  - .git/
+  - .code-intel/local/
+  - '*.log'
+  - tmp/
+  - cache/
+  - logs/
+  - node_modules/
+  - .next/
+  - dist/
+  - build/
+  - vendor/
+  - bootstrap/cache/
+  - storage/logs/
+  - storage/framework/
+  - __pycache__/
+  - venv/
+  - .venv/
+  - .pytest_cache/
+  - .ruff_cache/
+  - '*.egg-info/'
+  - '*.pyc'
+  - uploads/
+  - public/uploads/
+  - storage/app/public/
+  - target/
+  - release/artifacts/
+  include: []
+quality:
+  auto_risk: true
+  graph_is_advisory: true
+  absence_requires_coverage: true
+  dead_code_auto_delete: false
+  final_chat_report: true
+  max_auto_repair_cycles: 3
+checks:
+  commands:
+  - id: rust-tests
+    kind: test
+    argv: [bash, scripts/with-rust-toolchain.sh, test, --manifest-path, worker/Cargo.toml, --workspace]
+    cwd: .
+    timeout_sec: 900
+    required_for: [LOW, MEDIUM, HIGH, CRITICAL]
+  - id: hub-tests
+    kind: test
+    argv: [.venv/bin/pytest, -q, hub/tests, benchmarks]
+    cwd: .
+    timeout_sec: 900
+    required_for: [LOW, MEDIUM, HIGH, CRITICAL]
+  - id: acceptance-fixtures
+    kind: test
+    argv: [bash, scripts/with-rust-toolchain.sh, --exec, bash, scripts/run-acceptance-fixtures.sh]
+    cwd: .
+    timeout_sec: 900
+    required_for: [LOW, MEDIUM, HIGH, CRITICAL]
+  - id: rust-format
+    kind: lint
+    argv: [bash, scripts/with-rust-toolchain.sh, fmt, --all, --manifest-path, worker/Cargo.toml, --check]
+    cwd: .
+    timeout_sec: 120
+    required_for: [LOW, MEDIUM, HIGH, CRITICAL]
+  - id: python-lint
+    kind: lint
+    argv: [.venv/bin/ruff, check, hub]
+    cwd: .
+    timeout_sec: 120
+    required_for: [LOW, MEDIUM, HIGH, CRITICAL]
+  - id: rust-clippy
+    kind: lint
+    argv: [bash, scripts/with-rust-toolchain.sh, clippy, --manifest-path, worker/Cargo.toml, --workspace, --all-targets, --, -D, warnings]
+    cwd: .
+    timeout_sec: 900
+    required_for: [LOW, MEDIUM, HIGH, CRITICAL]
+  - id: installer-shellcheck
+    kind: lint
+    argv: [bash, -lc, 'shellcheck installers/*.sh adapters/install-agent-adapters.sh && shellcheck -s bash scripts/*.sh']
+    cwd: .
+    timeout_sec: 120
+    required_for: [LOW, MEDIUM, HIGH, CRITICAL]
+  - id: offline-environment-audit
+    kind: lint
+    argv: [bash, scripts/with-rust-toolchain.sh, --exec, python3, scripts/audit-environment.py]
+    cwd: .
+    timeout_sec: 120
+    required_for: [LOW, MEDIUM, HIGH, CRITICAL]
+smoke:
+  enabled: true
+  base_url: https://code-hub.example.com
+  endpoints:
+  - id: hub-ready
+    method: GET
+    path: /health/ready
+    expect_status: [200]
+    max_latency_ms: 3000
+    body_contains: '"status":"ready"'
+    header_exists: content-type
+  compare_latency: true
+runtime:
+  enabled: false
+  mode: on_demand
+  adapters:
+  - generic_trace_ingest
+  - http_trace
+  raw_trace_retention_days: 3
+security_scenarios:
+  enabled: false
+  mode: plan_only
+  environment: unclassified
+  authorization:
+    status: pending
+    scope_ref: null
+    expires_at: null
+  base_url: null
+  allowed_hosts: []
+  deny_production: true
+  allow_state_changing: false
+  max_requests: 24
+  max_concurrency: 1
+  timeout_sec: 10
+  max_response_bytes: 16384
+  local_evidence_only: true
+  require_correlation: true
+  actors: []
+  endpoint_inventory: []
+  scenarios: []
+  exclusions: []
+remote_analysis:
+  enabled: true
+  allow_source_bodies: false
+  allow_structured_live_queries: true
+storage:
+  global_soft_mb: 2048
+  global_hard_mb: 3072
+  minimum_free_disk_mb: 8192
+  per_project_soft_mb: 768
+  per_project_hard_mb: 1536
+  raw_runtime_global_mb: 512
+  content_cache_global_mb: 512

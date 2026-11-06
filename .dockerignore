@@ -1,0 +1,16 @@
+.git
+.venv
+.pytest_cache
+.ruff_cache
+build
+*.egg-info
+worker/target
+release/artifacts
+data
+secrets
+*.db
+*.db-wal
+*.db-shm
+*.key
+*.pem
+*.log

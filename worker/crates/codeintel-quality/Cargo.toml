@@ -1,0 +1,22 @@
+[package]
+name = "codeintel-quality"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+chrono.workspace = true
+hex.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+uuid.workspace = true
+codeintel-core = { path = "../codeintel-core" }
+codeintel-graph = { path = "../codeintel-graph" }
+codeintel-runtime = { path = "../codeintel-runtime" }
+
+[dev-dependencies]
+tempfile.workspace = true

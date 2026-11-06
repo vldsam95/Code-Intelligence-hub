@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% from "_pagination.html" import pagination %}
+{% block title %}{{ project.name }} — Code Intelligence{% endblock %}
+{% block extra_scripts %}<script defer src="/static/graph3d.js?v={{ product_version }}"></script>{% endblock %}
+{% block page_title %}{{ project.name }}{% endblock %}
+{% block content %}
+<section class="project-hero">
+  <div><p class="eyebrow">{{ project.slug }} · {{ project.id }}</p><p>{{ project.purpose or 'No project description yet.' }}</p></div>
+  <div class="gate-block"><span class="badge {{ health.currentness|lower }}">{{ health.currentness }}</span><strong>{{ health.last_quality_gate or 'UNKNOWN' }}</strong><small>Latest quality gate</small></div>
+</section>
+{% if recoveries %}<div class="alert warning">An external restore/revert was detected. Later evidence is retained as historical and is not considered current.</div>{% endif %}
+<nav class="tabs" aria-label="Project sections">
+  <a href="#overview">Code Health</a><a href="#architecture">Architecture</a><a href="#graph-visualization">3D Graph</a><a href="#history">Quality History</a><a href="#findings">Findings</a><a href="#project-access">Agent Access</a><a href="#instances">Instances</a><a href="#indexes">Indexes</a>
+</nav>
+<section id="overview" class="metric-grid compact">
+  <article><span>Current revision</span><strong class="code-value">{{ (health.current_revision or '—')[:16] }}</strong><small>{{ health.currentness }}</small></article>
+  <article><span>Worker</span><strong>{{ 'ONLINE' if health.worker_online else 'OFFLINE' }}</strong><small>{{ health.last_sync or 'No heartbeat' }}</small></article>
+  <article><span>Open FAIL</span><strong>{{ health.open_fail }}</strong><small>Blocking findings</small></article>
+  <article><span>Blocking UNKNOWN</span><strong>{{ health.blocking_unknowns }}</strong><small>Must remain visible</small></article>
+</section>
+<section class="panel registration-strip">
+  <div><span>Hub registration</span><strong class="badge {{ health.registration_state|lower }}">{{ health.registration_state }}</strong></div>
+  <div><span>Hub sync</span><strong class="badge {{ health.hub_sync|lower }}">{{ health.hub_sync }}</strong></div>
+  <div><span>Index</span><strong class="badge {{ health.index_status|lower }}">{{ health.index_status }}</strong></div>
+  <div><span>Wiki</span><strong>{{ health.wiki.mode }} · {{ health.wiki.binding_status }}</strong></div>
+</section>
+<section id="architecture" class="panel"><div class="panel-head"><div><p class="eyebrow">ARCHITECTURE & CONTEXT</p><h2>Operational overview</h2></div><span class="badge {{ (context_pack.freshness if context_pack else 'last_known')|lower }}">{{ context_pack.freshness if context_pack else 'LAST_KNOWN' }}</span></div>
+  <p class="architecture-copy">{{ context_pack.architecture_summary if context_pack and context_pack.architecture_summary else 'The Worker has not sent an architecture context pack yet. Do not infer anything from missing data.' }}</p>
+  {% if context_pack %}<div class="tag-row">{% for language in context_pack.languages %}<span>{{ language }}</span>{% endfor %}{% for framework in context_pack.frameworks %}<span>{{ framework }}</span>{% endfor %}</div>{% endif %}
+</section>
+<section id="graph-visualization" class="panel graph-panel" data-project-id="{{ project.id }}">
+  <div class="panel-head"><div><p class="eyebrow">ON-DEMAND 3D CODE MAP</p><h2>Interactive code map</h2></div><button id="build-graph" class="primary" type="button">Build visualization</button></div>
+  <p>This visualization is generated only on request from an online Worker's local graph. The Hub retains no raw graph: the result is bounded, contains no source and is removed from the central payload immediately after delivery to the browser.</p>
+  <div id="graph-status" class="alert info">No graph loaded. Visualization memory is allocated only when requested.</div>
+  <div id="graph-stage" class="graph-stage hidden">
+    <canvas id="graph-canvas" aria-label="Interactive 3D code graph"></canvas>
+    <aside id="graph-legend" class="graph-legend"><strong>Legend</strong><div id="graph-legend-items"></div><small>Drag to rotate · Scroll to zoom · Click a node for details</small></aside>
+    <div id="graph-node-detail" class="graph-node-detail">Select a node to view its path, kind and language.</div>
+  </div>
+</section>
+<section id="history" class="panel"><p class="eyebrow">CHANGES & QUALITY HISTORY</p><h2>Quality Runs</h2>
+  <div class="table-wrap"><table><thead><tr><th>Verdict</th><th>Currentness</th><th>Revision</th><th>Risk</th><th>Checks</th><th>Time</th></tr></thead><tbody>
+  {% for row in qualities %}<tr><td><span class="badge {{ row.verdict|lower }}">{{ row.verdict }}</span></td><td>{{ row.currentness }}</td><td><code>{{ row.source_revision_id[:12] }}</code></td><td>{{ row.risk_score }}</td><td>{{ row.completed_checks|join(', ') or '—' }}</td><td>{{ row.completed_at }}</td></tr>
+  {% else %}<tr><td colspan="6">No quality runs yet.</td></tr>{% endfor %}</tbody></table></div>
+  {{ pagination(qualities_pager, 'Quality Runs') }}
+</section>
+<section id="findings" class="panel"><p class="eyebrow">REVIEW FINDINGS</p><h2>Findings and unknowns</h2>
+  {% for row in findings %}<article class="finding {{ 'blocking' if row.blocking }}"><span class="badge {{ row.severity|lower }}">{{ row.severity }}</span><div><strong>{{ row.category }}</strong><p>{{ row.why }}</p><small>{{ row.path or 'No path' }} {{ row.source_range or '' }}</small></div></article>
+  {% else %}<div class="empty small"><p>No synchronized findings. This does not prove that there are no defects.</p></div>{% endfor %}
+  {{ pagination(findings_pager, 'Findings') }}
+</section>
+<section id="instances" class="panel"><p class="eyebrow">INSTANCES & HOSTS</p><h2>Physical instances</h2><div class="table-wrap"><table><thead><tr><th>Instance</th><th>Host</th><th>Path</th><th>Revision</th><th>Registration</th><th>Status</th></tr></thead><tbody>{% for row in instances %}<tr><td><code>{{ row.id[:12] }}</code></td><td><code>{{ row.host_id[:12] }}</code></td><td class="ltr">{{ row.primary_path }}</td><td><code>{{ (row.current_source_revision_id or '—')[:12] }}</code></td><td>{{ row.registration_state }}</td><td>{{ row.status }}</td></tr>{% else %}<tr><td colspan="6">No registered instances.</td></tr>{% endfor %}</tbody></table></div>{{ pagination(instances_pager, 'Instances') }}</section>
+<section id="project-access" class="panel accent remote-reader" data-project-id="{{ project.id }}">
+  <div class="panel-head"><div><p class="eyebrow">PROJECT ACCESS & AGENT SETUP</p><h2>One token per project for all authorized agents</h2></div><a class="secondary" href="/api/v1/projects/{{ project.id }}/agent-kit">Download Project Agent Kit</a></div>
+  <div class="alert info"><b>Local Code Intelligence requires no token.</b> Project Access is used only to read/update Hub context and history and request structured live analysis. It grants no remote shell and writes no files on another server.</div>
+  <div class="registration-strip"><div><span>Project ID</span><strong><code>{{ project.id }}</code></strong></div><div><span>Hub</span><strong>{{ health.hub_sync }}</strong></div><div><span>Project Access</span><strong>{{ 'ACTIVE' if project_access else 'MISSING' }}</strong></div><div><span>Local tools</span><strong>ALWAYS AVAILABLE</strong></div></div>
+  <div class="actions">
+  {% if project_access %}<button data-token-action="reveal" data-token-id="{{ project_access.id }}" data-token-type="PROJECT_AGENT" data-scope-id="{{ project.id }}">Reveal / Copy</button><button data-token-action="rotate" data-token-id="{{ project_access.id }}" data-token-type="PROJECT_AGENT" data-scope-id="{{ project.id }}">Rotate</button><button data-project-access-test data-project-id="{{ project.id }}">Test</button><button class="danger-button" data-project-access-revoke data-project-id="{{ project.id }}">Revoke Hub Access</button>{% else %}<button class="primary" data-project-access-create data-project-id="{{ project.id }}">Create Project Access</button>{% endif %}
+  </div>
+  <div id="token-result" class="secret-result hidden"><span>Project Access — keep out of Git</span><code></code><button data-copy-target="#token-result code" class="secondary">Copy</button></div>
+  <div class="endpoint-grid" aria-label="Project endpoints">
+    <div><small>Remote MCP</small><code>{{ base_url }}/mcp</code></div>
+    <div><small>Context Pack</small><code>{{ base_url }}/api/v1/projects/{{ project.id }}/context-pack</code></div>
+    <div><small>Code Health</small><code>{{ base_url }}/api/v1/projects/{{ project.id }}/health</code></div>
+    <div><small>Quality History</small><code>{{ base_url }}/api/v1/projects/{{ project.id }}/quality-history</code></div>
+    <div><small>Findings</small><code>{{ base_url }}/api/v1/projects/{{ project.id }}/findings</code></div>
+    <div><small>Live request</small><code>{{ base_url }}/api/v1/projects/{{ project.id }}/remote-analysis</code></div>
+  </div>
+  <h3>Complete setup for Codex / Claude / Hermes / Generic MCP</h3><p>Reveal inserts the credential into the prompt only in your browser. The same Project Access works for all clients; client/date are recorded as metadata.</p>
+  <textarea id="remote-reader-prompt" class="prompt-text" data-token-placeholder="&lt;PROJECT_ACCESS_TOKEN&gt;" readonly>{{ remote_reader_prompt }}</textarea>
+  <div class="actions"><button class="primary" data-copy-target="#remote-reader-prompt">Copy Full Agent Setup</button><button class="secondary" data-download-target="#remote-reader-prompt" data-download-name="CODEINTEL_{{ project.slug }}_AGENT_SETUP.txt">Download TXT</button><a class="secondary" href="/api/v1/docs/AGENT_OPERATING_POLICY.md?format=raw">Raw Skill Markdown</a></div>
+  <h3>Local MCP — work beside the source</h3><pre><code>{"mcpServers":{"code-intelligence":{"command":"codeintel","args":["mcp","serve","--stdio"]}}}</code></pre><p>For a clone without secrets, run <code>codeintel open .</code>. To link the same Hub project: <code>codeintel hub bind --hub {{ base_url }} --project-token &lt;TOKEN&gt;</code>. For a clone representing a new project: <code>codeintel fork-project</code>.</p>
+  <details><summary>Advanced / historical Project credentials</summary><div class="table-wrap"><table><thead><tr><th>Label</th><th>Prefix</th><th>Status</th><th>Created</th></tr></thead><tbody>{% for row in project_tokens %}<tr><td>{{ row.label }}</td><td><code>{{ row.token_prefix }}…</code></td><td>{{ row.status }}</td><td>{{ row.created_at }}</td></tr>{% else %}<tr><td colspan="4">No history.</td></tr>{% endfor %}</tbody></table></div>{{ pagination(project_tokens_pager, 'Project credentials') }}</details>
+  <h3 id="agent-activity">Recent Agent Activity</h3><div class="table-wrap"><table><thead><tr><th>Agent</th><th>Host</th><th>Activity</th><th>Time</th></tr></thead><tbody>{% for row in recent_agent_activity %}<tr><td>{{ row.agent_client }}{% if row.agent_version %}<small>{{ row.agent_version }}</small>{% endif %}</td><td><code>{{ (row.host_id or 'remote')[:12] }}</code></td><td>{{ row.activity }}</td><td>{{ row.started_at }}</td></tr>{% else %}<tr><td colspan="4">No recorded activity yet.</td></tr>{% endfor %}</tbody></table></div>{{ pagination(activity_pager, 'Agent activities') }}
+</section>
+<section id="indexes" class="panel"><p class="eyebrow">STORAGE & INDEXES</p><h2>Derived graph snapshots</h2><div class="table-wrap"><table><thead><tr><th>State</th><th>Revision</th><th>Size</th><th>Started</th></tr></thead><tbody>{% for row in snapshots %}<tr><td>{{ row.state }}</td><td><code>{{ row.source_revision_id[:12] }}</code></td><td>{{ row.db_size_bytes }} bytes</td><td>{{ row.started_at }}</td></tr>{% else %}<tr><td colspan="4">No synchronized snapshots.</td></tr>{% endfor %}</tbody></table></div>{{ pagination(snapshots_pager, 'Index Snapshots') }}</section>
+{% if recoveries %}<section id="recoveries" class="panel"><p class="eyebrow">RECOVERY EVENTS</p><h2>Restore / Rebind history</h2><div class="table-wrap"><table><thead><tr><th>Reason</th><th>Previous revision</th><th>Detected revision</th><th>Time</th></tr></thead><tbody>{% for row in recoveries %}<tr><td>{{ row.reason }}</td><td><code>{{ (row.previous_revision_id or '—')[:12] }}</code></td><td><code>{{ row.detected_revision_id[:12] }}</code></td><td>{{ row.created_at }}</td></tr>{% endfor %}</tbody></table></div>{{ pagination(recoveries_pager, 'Recovery Events') }}</section>{% endif %}
+<dialog id="reauth-dialog"><form method="dialog"><h3>Reauthenticate</h3><p>Enter the owner password to reveal or rotate a token.</p><label>Password<input id="reauth-password" type="password" autocomplete="current-password"></label><div class="dialog-actions"><button value="cancel">Cancel</button><button id="reauth-confirm" value="default" class="primary">Verify</button></div></form></dialog>
+{% endblock %}

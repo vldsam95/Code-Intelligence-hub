@@ -1,0 +1,21 @@
+{
+  "blocking_unknown_count": 3,
+  "completed_checks": [
+    "actual_source_verify",
+    "http_smoke",
+    "lint",
+    "structural_review",
+    "targeted_tests"
+  ],
+  "currentness": "STALE",
+  "failed_checks": [],
+  "note": "Historical evidence predates the public English distribution. Rebuild the graph and verify the current source revision before relying on this record.",
+  "policy_hash": "05454d19dc41bce3bb1aeddc10f61bdac26314352d79f583c007fdb1add20877",
+  "produced_at": "2026-09-09T11:43:13.108618019Z",
+  "producer": "codeintel-quality/1.3.0",
+  "quality_gate": "UNKNOWN",
+  "risk_score": 83,
+  "schema_version": 1,
+  "source_revision_id": "6b169189e5ca8fc4bf20f6b6204ae967bd43db270d4070126125080022b25dfd",
+  "warning_count": 3
+}

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>{% block title %}Code Intelligence Hub{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+  <link rel="stylesheet" href="/static/app.css?v={{ product_version }}">
+  <script defer src="/static/htmx.min.js?v=2.0.7"></script>
+  <script defer src="/static/app.js?v={{ product_version }}"></script>
+  {% block extra_scripts %}{% endblock %}
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="/dashboard" aria-label="Code Intelligence Hub">
+      <span class="brand-mark">CI</span>
+      <span><strong>Code Intelligence</strong><small>Control & Knowledge Plane</small></span>
+    </a>
+    <nav aria-label="Main navigation">
+      <a class="{{ 'active' if active == 'dashboard' }}" href="/dashboard"><span>◫</span> Dashboard</a>
+      <a class="{{ 'active' if active == 'projects' }}" href="/projects"><span>⌘</span> Projects</a>
+      <a class="{{ 'active' if active == 'hosts' }}" href="/hosts"><span>▣</span> Hosts & Workers</a>
+      <a class="{{ 'active' if active == 'agent-center' }}" href="/agent-center"><span>✦</span> Agent Center</a>
+      <a class="{{ 'active' if active == 'agent-toolkit' }}" href="/agent-toolkit"><span>◎</span> Prompts & Skills</a>
+      <a class="{{ 'active' if active == 'guides' }}" href="/guides"><span>?</span> Guides</a>
+      <a class="{{ 'active' if active == 'downloads' }}" href="/downloads"><span>⇩</span> Downloads & Installation</a>
+      <a class="{{ 'active' if active == 'api-mcp' }}" href="/api-mcp"><span>{ }</span> API & MCP</a>
+      <a class="{{ 'active' if active == 'tokens' }}" href="/tokens"><span>⌑</span> Tokens & Connections</a>
+      <a class="{{ 'active' if active == 'documentation' }}" href="/documentation"><span>≡</span> Documentation</a>
+      <a class="{{ 'active' if active == 'system-health' }}" href="/system-health"><span>●</span> System Health</a>
+      <a class="{{ 'active' if active == 'settings' }}" href="/settings"><span>⚙</span> Settings</a>
+    </nav>
+    <div class="sidebar-foot">
+      <span class="online-dot"></span> Hub v{{ product_version }}
+      <form method="post" action="/logout">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button type="submit" class="link-button">Sign out</button>
+      </form>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">CENTRAL HUB</p>
+        <h1>{% block page_title %}Code Intelligence{% endblock %}</h1>
+      </div>
+      <div class="owner-chip"><span>Owner</span><strong>{{ owner.username }}</strong></div>
+    </header>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

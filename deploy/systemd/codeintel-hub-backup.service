@@ -1,0 +1,8 @@
+[Unit]
+Description=Encrypted online backup of Code Intelligence Hub
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/code-intelligence/scripts/backup-hub.sh
+

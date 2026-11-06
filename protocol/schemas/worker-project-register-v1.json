@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "worker-project-register-v1",
+  "type": "object",
+  "required": ["project_id", "slug", "name", "instance_id", "host_id", "primary_path", "revision"],
+  "properties": {
+    "project_id": {"type": "string", "format": "uuid"},
+    "slug": {"type": "string"},
+    "name": {"type": "string"},
+    "instance_id": {"type": "string", "format": "uuid"},
+    "host_id": {"type": "string", "format": "uuid"},
+    "primary_path": {"type": "string"},
+    "related_roots": {"type": "array"},
+    "revision": {"type": "object"}
+  },
+  "additionalProperties": false
+}

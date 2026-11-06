@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Agent Center — Code Intelligence{% endblock %}
+{% block page_title %}Agent Center{% endblock %}
+{% block content %}
+<section class="panel"><p class="eyebrow">SECURITY SCENARIOS</p><p>Run security scenarios only with explicit authorization, a valid policy and a defined lab/staging target. Evidence stays local and covers only the matrix that was run.</p></section>
+<div class="page-intro"><p>One canonical policy is used for MCP initialization, the skill, raw Markdown and bootstrap. Agents use their normal editing tools; Code Intelligence adds understanding, review and verification.</p></div>
+<section class="panel accent"><p class="eyebrow">NON-TECHNICAL SETUP</p><h2>Want your agent to handle setup?</h2><p>Prompts & Skills provides a universal prompt and ZIP. The Guides page explains each workflow visually and provides a complete agent prompt.</p><div class="actions"><a class="primary" href="/guides">Open guides</a><a class="secondary" href="/agent-toolkit">Prompts & Skills</a></div></section>
+<section class="cards-grid agent-grid">
+  <article class="panel"><span class="client-icon">C</span><h2>Codex CLI</h2><p>Local stdio MCP, client-version-aware configuration detection and a compact skill.</p><a href="/documentation?doc=CODEX_CLI_SETUP.md">Full instructions</a></article>
+  <article class="panel"><span class="client-icon">A</span><h2>Claude Code</h2><p>An idempotent adapter that preserves existing MCP settings.</p><a href="/documentation?doc=CLAUDE_CODE_SETUP.md">Full instructions</a></article>
+  <article class="panel"><span class="client-icon">H</span><h2>Hermes</h2><p>The same local MCP, without a separate graph or daemon.</p><a href="/documentation?doc=HERMES_SETUP.md">Full instructions</a></article>
+  <article class="panel"><span class="client-icon">M</span><h2>Generic MCP</h2><p>Any compatible MCP client can run <code>codeintel mcp serve --stdio</code>.</p><a href="/documentation?doc=GENERIC_MCP_SETUP.md">Full instructions</a></article>
+</section>
+<section class="panel accent"><p class="eyebrow">STANDARD WORKFLOW</p><h2>Required workflow</h2><div class="workflow"><span>open</span><i>→</i><span>context</span><i>→</i><span>preflight</span><i>→</i><span>actual source</span><i>→</i><span>edit</span><i>→</i><span>review</span><i>→</i><span>verify</span><i>→</i><span>gate</span></div><p>Agents must explicitly report FAIL or blocking UNKNOWN in chat when completing a code task.</p></section>
+<section class="panel"><p class="eyebrow">REMOTE AGENT</p><h2>Connect from a computer without source access</h2><p>Open the project in the Hub and copy Agent Setup. The same Project Access credential lets Codex, Claude, Hermes or another authorized agent read context and request structured live analysis. It grants no remote shell and does not replace direct source access for code work.</p><pre><code>{
+  "url": "{{ base_url }}/mcp",
+  "headers": {"Authorization": "Bearer &lt;PROJECT_ACCESS_TOKEN&gt;"}
+}</code></pre></section>
+{% endblock %}

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "code-intelligence": {
+      "command": "/usr/local/bin/codeintel",
+      "args": ["mcp", "serve", "--stdio"]
+    }
+  }
+}

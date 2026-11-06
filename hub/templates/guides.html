@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Guides — Code Intelligence{% endblock %}
+{% block page_title %}Practical guides with ready-to-use prompts{% endblock %}
+{% block content %}
+<div class="page-intro"><p>Choose a workflow, read three simple steps and copy the complete prompt to your agent. There is no need to edit YAML, copy UUIDs manually or select analysis tools.</p></div>
+<section class="journey" aria-label="Getting started workflow">
+  <div><b>1</b><span>Install the Worker once</span></div><i>→</i>
+  <div><b>2</b><span>Enable only the project you select</span></div><i>→</i>
+  <div><b>3</b><span>Request a normal code change</span></div><i>→</i>
+  <div><b>4</b><span>Receive review and a quality gate</span></div>
+</section>
+<section class="guide-grid">
+{% for slug, item in guides.items() %}
+  <a class="guide-card {{ 'selected' if slug == selected_slug }}" href="/guides?guide={{ slug }}">
+    <span>{{ item.icon }}</span><strong>{{ item.title }}</strong><small>Open guide and prompt</small>
+  </a>
+{% endfor %}
+</section>
+<section class="panel accent">
+  <div class="panel-head"><div><p class="eyebrow">3 SIMPLE STEPS</p><h2>{{ selected.title }}</h2></div><a class="secondary" href="{{ raw_url }}">Raw Markdown</a></div>
+  <div class="guide-flow">
+    {% for step in selected.steps %}<div><b>{{ loop.index }}</b><span>{{ step }}</span></div>{% if not loop.last %}<i>→</i>{% endif %}{% endfor %}
+  </div>
+</section>
+<section class="panel guide-document">
+  <div class="docs-content">{{ rendered|safe }}</div>
+  <div class="copy-box">
+    <h3>Complete document to copy</h3>
+    <p>Replace only values inside <code>&lt;...&gt;</code>. Keep tokens out of Git.</p>
+    <textarea id="simple-guide-source" class="prompt-text" readonly>{{ raw_guide }}</textarea>
+    <div class="actions"><button class="primary" data-copy-target="#simple-guide-source">Copy all</button><button class="secondary" data-download-target="#simple-guide-source" data-download-name="{{ selected.file }}">Download file</button></div>
+  </div>
+</section>
+{% endblock %}

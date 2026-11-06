@@ -1,0 +1,4 @@
+mode: optional
+url: https://code-hub.example
+credential_ref: local/project-access.token
+# Never place a token in this tracked file.

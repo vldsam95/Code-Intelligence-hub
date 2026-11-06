@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "_pagination.html" import pagination %}
+{% block title %}Downloads — Code Intelligence{% endblock %}
+{% block page_title %}Downloads, Installation & File Transfer{% endblock %}
+{% block content %}
+<section class="panel"><p class="eyebrow">RELEASE {{ product_version }}</p><h2>Updated Worker for broader, governed analysis</h2><p>This release adds embedded C# and Rust indexing, tighter context limits and governed local API security scenarios. Security scenarios are disabled by default and run only against a preconfigured, authorized lab or staging environment.</p><div class="actions"><a class="secondary" href="/documentation?doc=SECURITY_SCENARIOS.md">Security scenario documentation</a><a class="secondary" href="/agent-toolkit">Updated prompt and skill</a></div></section>
+<section class="panel accent"><p class="eyebrow">ONE-LINE INSTALL</p><h2>Install a Worker on a VPS or new computer</h2>
+  <ol class="steps"><li><b>For Hub connectivity:</b> create a single-use Host Install Token. Without a Hub, use <code>--local-only</code>.</li><li><b>On the new host:</b> run one command to install the Worker, local MCP and skills together.</li><li><b>In a project:</b> <code>init</code> only after an explicit onboarding request; after cloning, use <code>open</code>.</li></ol>
+  <pre><code id="install-command">curl -fsSL {{ base_url }}/downloads/install.sh | sh -s -- \
+  --hub {{ base_url }} \
+  --install-token &lt;OPTIONAL_INSTALL_TOKEN&gt; \
+  --clients codex,claude,hermes</code></pre><button data-copy-target="#install-command" class="secondary">Copy command</button>
+  <p><a class="primary" href="/hosts">Create a Host Install Token and prepared command</a></p>
+</section>
+<section class="panel accent"><p class="eyebrow">NO CURL / MANUAL TRANSFER</p><h2>Complete ZIP for Linux and Windows/WSL</h2>{% if manual_bundle %}<p>This file comes from the same release and build as the curl installer. It includes amd64/arm64 binaries, a Hub package for authorized recovery, an offline installer, Windows/WSL2 PowerShell, checksums, a signed manifest, MCP adapters, a skill, a prompt and documentation.</p><div class="actions"><a class="primary" href="/downloads/{{ manual_bundle.name }}">Download complete ZIP</a><a class="secondary" href="/agent-toolkit">Open universal prompt</a></div><p><code>{{ manual_bundle.sha256 }}</code></p>{% else %}<div class="alert warning">No manual ZIP has been published for this release yet.</div>{% endif %}</section>
+<section class="two-col">
+  <article class="panel"><p class="eyebrow">WHAT TO COPY — PROJECT MOVE</p><h2>Move a project between hosts</h2><p>Transfer the entire source directory, including these three portable inputs:</p><pre><code>.code-intel/
+├── project.yaml / policy.yaml / AGENT_POLICY.md
+├── SKILL.md / README_AGENT.md
+├── context/
+├── portability/
+└── hub.example.yaml</code></pre><p><code>local/</code>, graph databases, traces, caches and credentials stay outside Git. The Worker rebuilds the graph for the local revision.</p></article>
+  <article class="panel"><p class="eyebrow">WHAT TO GIVE THE AGENT</p><h2>New host / agent requiring setup guidance</h2><ul class="check-list"><li>A prepared prompt from Prompts & Skills</li><li>A single-use Host Install Token, only for Hub connectivity</li><li>If curl is blocked: the complete ZIP</li><li>The path of the project to enable explicitly</li><li>A Wiki ID only when a real binding exists</li></ul><p>Without a token, the agent installs in local-only mode and all code features remain available. Never send Worker credentials, master keys or owner passwords.</p></article>
+</section>
+<section class="two-col"><article class="panel"><p class="eyebrow">LINUX</p><h2>Install from a ZIP</h2><pre><code>sudo ./install-offline.sh \
+  --hub {{ base_url }} \
+  --install-token '&lt;OPTIONAL_INSTALL_TOKEN&gt;' \
+  --clients codex,claude,hermes</code></pre></article><article class="panel"><p class="eyebrow">WINDOWS</p><h2>PowerShell + WSL2</h2><pre><code>.\install-windows-wsl.ps1 `
+  -Hub '{{ base_url }}' `
+  -InstallToken '&lt;OPTIONAL_INSTALL_TOKEN&gt;' `
+  -Clients 'codex,claude,hermes'</code></pre><p>Native Windows does not provide Unix sockets/systemd; the script installs the Worker inside WSL2 with systemd.</p></article></section>
+<section class="panel"><p class="eyebrow">RELEASE ARTIFACTS</p><h2>Available files</h2><div class="table-wrap"><table><thead><tr><th>File</th><th>Platform</th><th>Version</th><th>SHA‑256</th><th>Signature</th><th></th></tr></thead><tbody>
+{% for row in artifacts %}<tr><td>{{ row.name }}</td><td>{{ row.platform }}</td><td>{{ row.version }}</td><td><code>{{ row.sha256[:18] }}…</code></td><td>{{ row.signature_status }}</td><td><a href="/downloads/{{ row.name }}">Download</a></td></tr>
+{% else %}<tr><td colspan="6">No release artifacts have been published yet. install.sh is served at its fixed path after a release build.</td></tr>{% endfor %}</tbody></table></div>{{ pagination(pager, 'Release Artifacts') }}</section>
+{% endblock %}

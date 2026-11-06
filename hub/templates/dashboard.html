@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% from "_pagination.html" import pagination %}
+{% block title %}Dashboard — Code Intelligence{% endblock %}
+{% block page_title %}Code health with justified confidence{% endblock %}
+{% block content %}
+<section class="hero-strip">
+  <div><span class="pulse"></span><strong>Hub online</strong><small>Local Workers continue working during Hub outages</small></div>
+  <p>PASS always refers to an exact source revision; it does not guarantee that all business logic is correct.</p>
+</section>
+<section class="metric-grid">
+  <article><span>Active projects</span><strong>{{ counters.projects }}</strong><small>Git-independent identity</small></article>
+  <article><span>Registered Workers</span><strong>{{ counters.workers }}</strong><small>Outbound connections only</small></article>
+  <article class="warning"><span>Unverified changes</span><strong>{{ counters.unverified }}</strong><small>Require review and a quality gate</small></article>
+  <article class="danger"><span>Blocking unknowns</span><strong>{{ counters.blocking }}</strong><small>Never hidden behind PASS</small></article>
+</section>
+<section class="panel">
+  <div class="panel-head"><div><p class="eyebrow">PROJECT HEALTH</p><h2>Projects</h2></div><a href="/projects" class="secondary">View all projects</a></div>
+  {% if projects %}
+  <div class="table-wrap"><table>
+    <thead><tr><th>Project</th><th>Registration</th><th>Currentness</th><th>Quality Gate</th><th>Worker</th><th>Revision</th><th>Last synchronization</th></tr></thead>
+    <tbody>{% for row in projects %}<tr>
+      <td><a class="project-link" href="/projects/{{ row.project.id }}/view">{{ row.project.name }}<small>{{ row.project.slug }}</small></a></td>
+      <td><span class="badge {{ row.health.registration_state|lower }}">{{ row.health.registration_state }}</span></td>
+      <td><span class="badge {{ row.health.currentness|lower }}">{{ row.health.currentness }}</span></td>
+      <td><span class="badge {{ (row.health.last_quality_gate or 'unknown')|lower }}">{{ row.health.last_quality_gate or 'UNKNOWN' }}</span></td>
+      <td><span class="status-dot {{ 'good' if row.health.worker_online else 'off' }}"></span>{{ 'Online' if row.health.worker_online else 'Offline' }}</td>
+      <td><code>{{ (row.health.current_revision or '—')[:12] }}</code></td>
+      <td>{{ row.health.last_sync or 'Not yet synchronized' }}</td>
+    </tr>{% endfor %}</tbody>
+  </table></div>
+  {{ pagination(pager, 'Projects') }}
+  {% else %}
+  <div class="empty"><span>⌘</span><h3>No registered projects yet</h3><p>Install a Worker, create an enrollment token and run <code>codeintel init</code> inside your first project.</p><a class="primary" href="/downloads">Installation instructions</a></div>
+  {% endif %}
+</section>
+<section class="two-col">
+  <article class="panel"><p class="eyebrow">OPERATING MODEL</p><h2>Where information lives</h2>
+    <div class="flow-list"><div><b>Actual Source + Raw Graph</b><span>Remain on the local Worker</span></div><i>→</i><div><b>Context + Evidence</b><span>Synchronize with the Hub</span></div><i>→</i><div><b>Agent</b><span>Receives focused answers</span></div></div>
+  </article>
+  <article class="panel"><p class="eyebrow">WIKI INDEPENDENCE</p><h2>LLM Wiki is optional</h2><p>All core features, including review, runtime, data-flow and quality gates, work with <code>wiki.mode=none</code>. A Wiki failure never makes code checks fail.</p></article>
+</section>
+{% endblock %}
